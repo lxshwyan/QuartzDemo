@@ -9,9 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NLog.Extensions.Logging;
+using NLog.Web;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Spi;
+using QuartzDemo.Core;
 using QuartzDemo.Quarzs;
 
 namespace QuartzDemo
@@ -36,15 +39,25 @@ namespace QuartzDemo
             services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();//注册ISchedulerFactory的实例。
          
             services.AddSingleton<IJobFactory, IOCJobFactory>();
+            
+         // EnginContext.Initialize(new GeneralEngine(services.BuildServiceProvider()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env,IApplicationLifetime appLifetime )
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory,IApplicationLifetime appLifetime )
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            #region AddNLog
+            //添加NLog  
+            loggerFactory.AddNLog();
+            //读取Nlog配置文件 
+            env.ConfigureNLog("nlog.config");
+            #endregion
+          EnginContext.Initialize(new GeneralEngine(app.ApplicationServices));
             //获取前面注入的Quartz调度类
             var quartz = app.ApplicationServices.GetRequiredService<QuartzStartup>();
             appLifetime.ApplicationStarted.Register(() =>
