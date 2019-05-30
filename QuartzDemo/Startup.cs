@@ -67,7 +67,9 @@ namespace QuartzDemo
             #region 远程读取日志
             FileExtensionContentTypeProvider provider = new FileExtensionContentTypeProvider(); 
           //  provider.Mappings[".log"] = "text/plain;charset=utf-8";
-          provider.Mappings[".log"] = "text/plain;charset=utf-8";
+            provider.Mappings[".log"] = "text/plain;charset=utf-8";
+
+       
             string basePath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
             app.UseStaticFiles(new StaticFileOptions()
             {
